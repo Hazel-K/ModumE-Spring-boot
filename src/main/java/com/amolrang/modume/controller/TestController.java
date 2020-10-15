@@ -17,6 +17,7 @@ public class TestController {
 	@MessageMapping("/chat.sendMessage")
 	@SendTo("/topic/public")
 	public ChatMessage sendMessage(@Payload ChatMessage chatMessage) {
+		//log로 데이터를 뽑고 싶을때 {} 꼭 쓰기
 		log.info("chatMessage : {}" + chatMessage.toString());
 		return chatMessage;
 	}
