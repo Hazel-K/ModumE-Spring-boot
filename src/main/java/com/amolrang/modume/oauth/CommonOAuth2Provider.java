@@ -8,6 +8,8 @@ import org.springframework.security.oauth2.core.oidc.IdTokenClaimNames;
 
 public enum CommonOAuth2Provider {
 	GOOGLE {
+		// API KEY
+		// AIzaSyAr2aW-trtWelUhL-bxfHgcztE1AAxFKiU
 		@Override
 		public Builder getBuilder(String registrationID) {
 			ClientRegistration.Builder builder = getBuilder(registrationID, ClientAuthenticationMethod.BASIC);
@@ -18,9 +20,27 @@ public enum CommonOAuth2Provider {
 			builder.userInfoUri("https://www.googleapis.com/oauth2/v3/userinfo");
 			builder.userNameAttributeName(IdTokenClaimNames.SUB);
 			builder.clientName("Google");
+			builder.clientId("327498212271-k08jmuqgri0octbl5tt78h749pf5irg5.apps.googleusercontent.com");
+			builder.clientSecret("sB_WQ5-BCPHXcvEcSjoeUyI8");
 			return builder;
 		}
+	},
+	TWITCH{
+	    @Override
+	    public ClientRegistration.Builder getBuilder(String registrationID) {
+	    	return getBuilder("twitch", ClientAuthenticationMethod.POST)
+			.scope("user:edit","user:read:email"/*,"openid"*/)
+			.authorizationUri("https://id.twitch.tv/oauth2/authorize")
+			.tokenUri("https://id.twitch.tv/oauth2/token")
+			.userInfoUri("https://id.twitch.tv/oauth2/userinfo")
+			.userNameAttributeName(IdTokenClaimNames.SUB)
+			.clientName("twitch")
+			.clientId("nb7cdnmp6y4wuqcnfh31c92oh0k8l7")
+			.clientSecret("u3cpdd9wnlnrmkh1fh8ar4kr7iu12n");
+	    }
 	};
+	
+	
 
     private static final String DEFAULT_REDIRECT_URL = "{baseUrl}/login/oauth2/code/{registrationId}";
 

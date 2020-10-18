@@ -113,6 +113,7 @@ function onMessageReceived(payload){
 		messageElement.className='chat-message';
 		inputUl.append(messageElement);
 		
+
 		/*var avatarElement = document.createElement('i');
 		var avatarText = document.createElement(message.sender[0]);
 		avatarElement.appendChild(avatarText);
@@ -122,6 +123,7 @@ function onMessageReceived(payload){
 		/*messageElement.appendChild(avatarElement);*/
 		
 		
+
 		var usernameElement = document.createElement('span');
 		var usernameText = document.createTextNode(message.sender);
 		usernameElement.appendChild(usernameText);
@@ -134,6 +136,7 @@ function onMessageReceived(payload){
 	
 	messageElement.appendChild(textElement);
 }
+
 /*function getAvatarColor(messageSender) {
     var hash = 0;
     for (var i = 0; i < messageSender.length; i++) {
