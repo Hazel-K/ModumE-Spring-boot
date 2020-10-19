@@ -1,6 +1,8 @@
 package com.amolrang.modume.controller;
 
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,8 +66,14 @@ public class AuthenticationController {
 					siteUrlCustom(authentication.getAuthorizedClientRegistrationId(), userInfoEndpointUri),
 					HttpMethod.GET, entity, Map.class);
 			Map userAttributes = response.getBody();
+			
+			Map userInfo = (Map)userAttributes.get("properties");
+			
+			
 
 			log.info("response:{}", response);
+//			log.info("userAttributes_id:{}", userAttributes.get("id"));
+//			log.info("userAttributes_nickname:{}", userInfo.get("nickname"));
 			model.addAttribute("userInfo", userAttributes);
 			ra.addFlashAttribute("userInfo", userAttributes);
 		}
