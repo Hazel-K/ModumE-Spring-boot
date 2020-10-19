@@ -14,7 +14,7 @@ public interface UserMapper {
 	@Select("SELECT * FROM USER_INFO WHERE id=#{id}")
 	UserModel readUser(String id);
 	
-	@Insert("INSERT INTO user_info(id, password, isAccountNonexpired, isAccountNonLocked, isCredentialsNonExpired, isEnabled, userName)(select #{id}, #{password}, #{isAccountNonExpired}, #{isAccountNonLocked}, #{isCredentialsNonExpired}, #{isEnabled}, #{userName})")
+	@Insert("INSERT INTO user_info(id, password, isAccountNonexpired, isAccountNonLocked, isCredentialsNonExpired, isEnabled, username)(select #{id}, #{password}, #{isAccountNonExpired}, #{isAccountNonLocked}, #{isCredentialsNonExpired}, #{isEnabled}, #{username})")
 	int insertUser(UserModel userModel);
 	
 	@Insert("INSERT INTO AUTHORITY VALUES(#{id},#{autority})")

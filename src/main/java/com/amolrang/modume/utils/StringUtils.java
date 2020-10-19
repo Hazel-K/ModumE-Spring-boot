@@ -1,6 +1,7 @@
 package com.amolrang.modume.utils;
 
 import org.springframework.lang.Nullable;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,4 +20,19 @@ public class StringUtils extends org.springframework.util.StringUtils{
 
 	//거부 당한 경로,
 	public final static String Denied() {return "/denied";}
+	
+	public static String siteUrlCustom(String site, String baseUrl) {
+		UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(baseUrl);
+
+		switch (site) {
+		case "facebook":
+			uriBuilder.queryParam("fields", "name,email,picture,locale");
+			break;
+
+		default:
+			uriBuilder.query("");
+		}
+
+		return uriBuilder.toUriString();
+	}
 }

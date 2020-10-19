@@ -62,4 +62,6 @@ public class UserModel implements UserDetails {
 		// TODO Auto-generated method stub
 		return this.isEnabled;
 	}
+	
+	
 }
