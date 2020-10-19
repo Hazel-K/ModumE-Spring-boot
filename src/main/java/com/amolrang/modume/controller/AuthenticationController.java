@@ -1,19 +1,27 @@
 package com.amolrang.modume.controller;
 
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import com.amolrang.modume.api.CallApi;
 import com.amolrang.modume.model.UserModel;
 import com.amolrang.modume.service.UserService;
 import com.amolrang.modume.utils.StringUtils;
@@ -25,12 +33,8 @@ import lombok.extern.slf4j.Slf4j;
 public class AuthenticationController {
 	@Autowired
 	private UserService userService;
-
 	@Autowired
 	private OAuth2AuthorizedClientService authorizedClientService;
-	
-	@Autowired
-	private CallApi callApi;
 
 	@RequestMapping(value = "/login", method = RequestMethod.GET)
 	public String login(Model model, Principal principal) {
@@ -44,12 +48,51 @@ public class AuthenticationController {
 		log.info("로그인 성공 페이지 GET접근 :{}", authentication);
 		model.addAttribute(StringUtils.TitleKey(), "로그인 성공 페이지");
 
-		Map UserInfoJson = callApi.CallUserInfoToJson(authentication, authorizedClientService);
+		OAuth2AuthorizedClient client = authorizedClientService
+				.loadAuthorizedClient(authentication.getAuthorizedClientRegistrationId(), authentication.getName());
+		log.info("access token:{}", client.getAccessToken().getTokenValue());
 
-		model.addAttribute("userInfo", UserInfoJson);
-		ra.addFlashAttribute("userInfo", UserInfoJson);
-		
+		String userInfoEndpointUri = client.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUri();
+		log.info("userInfoEndpointUri:{}", userInfoEndpointUri);
+		// api 유저정보 요청
+		if (!StringUtils.isEmpty(userInfoEndpointUri)) {
+			RestTemplate restTemplate = new RestTemplate();
+			HttpHeaders headers = new HttpHeaders();
+			headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + client.getAccessToken().getTokenValue());
+
+			// 유저정보 조회
+			HttpEntity entity = new HttpEntity(headers);
+			ResponseEntity<Map> response = restTemplate.exchange(
+					siteUrlCustom(authentication.getAuthorizedClientRegistrationId(), userInfoEndpointUri),
+					HttpMethod.GET, entity, Map.class);
+			Map userAttributes = response.getBody();
+			
+			Map userInfo = (Map)userAttributes.get("properties");
+			
+			
+
+			log.info("response:{}", response);
+//			log.info("userAttributes_id:{}", userAttributes.get("id"));
+//			log.info("userAttributes_nickname:{}", userInfo.get("nickname"));
+			model.addAttribute("userInfo", userAttributes);
+			ra.addFlashAttribute("userInfo", userAttributes);
+		}
 		return "redirect:/main";
+	}
+
+	protected String siteUrlCustom(String site, String baseUrl) {
+		UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(baseUrl);
+
+		switch (site) {
+		case "facebook":
+			uriBuilder.queryParam("fields", "name,email,picture,locale");
+			break;
+
+		default:
+			uriBuilder.query("");
+		}
+
+		return uriBuilder.toUriString();
 	}
 
 	@RequestMapping(value = "/join", method = RequestMethod.GET)
